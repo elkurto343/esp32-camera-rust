@@ -1,0 +1,31 @@
+[package]
+name = "esp32-camera-rust"
+version = "0.1.0"
+authors = ["benji343"]
+edition = "2021"
+resolver = "2"
+
+[profile.release]
+opt-level = "s"
+
+[profile.dev]
+debug = true # Symbols are nice and they don't increase the size on Flash
+opt-level = "z"
+
+[features]
+pio = ["esp-idf-sys/pio"]
+
+[dependencies]
+esp-idf-sys = { version = "0.32.1", features = ["binstart"] }
+# esp-idf-hal = { version = "0.40.1" }
+esp-idf-hal = { git = "https://github.com/benji343/esp-idf-hal-camera-fix" }
+# esp-idf-svc = { version = "0.45.0" }
+base64 = "0.21.0"
+
+[build-dependencies]
+embuild = "0.31.1" 
+
+[package.metadata.esp-idf-sys]
+extra_components = [
+  { component_dirs = "./esp32-camera", bindings_header = "esp32-camera-bindings.h" }
+]
