@@ -22,10 +22,3 @@ extra_components = [
 ```
 
 At the time of writing, setting `bindings_module` was triggering compile errors related to `c_types`.
-
-Without `bindings_module` there was also another issue to contend with related to a naming conflict
-between `esp32-camera` and `esp-idf-hal`. There was a `static` for "resolution" that would error
-during compile. `esp-idf-half` was forked into [`esp-idf-hal-camera-fix`](https://github.com/benji343/esp-idf-hal-camera-fix)
-but is now incompatible with `esp-idf-svc`.
-
-- https://github.com/esp-rs/esp-idf-hal/issues/215#issuecomment-1462363166
