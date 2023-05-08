@@ -7,6 +7,7 @@ pub enum Message {
     Restart,
 }
 
+#[derive(Debug)]
 pub enum Response {
     Capture(Vec<u8>),
     Format(bool),
