@@ -1,3 +1,3 @@
-[hardware-check]
-wifi_ssid = "FBI Surveillance Van"
-wifi_psk = "hunter2"
+[esp32-camera-rust]
+ssid = "FBI Surveillance Van"
+pass = "hunter2"
