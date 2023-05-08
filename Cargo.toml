@@ -5,15 +5,21 @@ authors = ["benji343"]
 edition = "2021"
 resolver = "2"
 
+# [env]
+# ESP_IDF_TOOLS_INSTALL_DIR = { value = "global" } 
+
 [profile.release]
+# https://github.com/johnthagen/min-sized-rust
+strip = true
+lto = true
 opt-level = "s"
 
 [profile.dev]
 debug = true # Symbols are nice and they don't increase the size on Flash
 opt-level = "z"
 
-[features]
-pio = ["esp-idf-sys/pio"]
+# [features]
+# pio = ["esp-idf-sys/pio"]
 
 [dependencies]
 esp-idf-sys = { version = "0.32.1", features = ["binstart"] }
