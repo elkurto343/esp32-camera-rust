@@ -1,3 +1,4 @@
+use esp_idf_hal::{gpio::PinDriver, peripherals::Peripherals};
 use esp_idf_sys::{self as _, esp_camera_fb_get, esp_camera_fb_return, esp_camera_init};
 
 use std::thread;
@@ -6,25 +7,28 @@ use std::time::Duration;
 use base64::Engine;
 
 mod ov2460_config;
-use ov2460_config::{ov2460_config, FrameSize, PixelFormat};
+use ov2460_config::ov2460_config;
 
-fn main() {
+// const LED_BUILTIN = 2;
+
+fn main() -> anyhow::Result<()> {
     esp_idf_sys::link_patches();
+
+    let peripherals = Peripherals::take().unwrap();
+    // TODO: how to make this use constant
+    let mut led = PinDriver::output(peripherals.pins.gpio2)?;
 
     // Initialize the camera
     // TODO: toggle frame size and capture interval
-    let result = unsafe {
-        esp_camera_init(&ov2460_config(
-            Some(PixelFormat::JPEG),
-            Some(FrameSize::SXGA),
-        ))
-    };
+    let result = unsafe { esp_camera_init(&ov2460_config(None, None)) };
     if result != 0 {
         panic!("Camera initialization failed with error {}", result);
     }
 
     loop {
         // TODO: listen to TCP for messages
+
+        led.set_high()?;
 
         // Capture an image
         let fb = unsafe { esp_camera_fb_get() };
@@ -46,6 +50,8 @@ fn main() {
 
         // Return the frame buffer to the camera driver
         unsafe { esp_camera_fb_return(fb) };
+
+        led.set_low()?;
 
         // Wait for 5 seconds
         thread::sleep(Duration::from_secs(15));
