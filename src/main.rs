@@ -1,11 +1,11 @@
-use esp_idf_hal::{gpio::PinDriver, peripherals::Peripherals};
+use esp_idf_hal::{gpio::PinDriver, peripherals::Peripherals, reset::restart};
 use esp_idf_svc::eventloop::EspSystemEventLoop;
 use esp_idf_sys::{self as _, esp_camera_init};
 
 use std::net::TcpListener;
 
 mod ov2460_config;
-use ov2460_config::ov2460_config;
+use ov2460_config::OV2460Config;
 
 mod wifi;
 use wifi::wifi;
@@ -21,12 +21,15 @@ fn main() -> anyhow::Result<()> {
 
     let sysloop = EspSystemEventLoop::take()?;
     let peripherals = Peripherals::take().unwrap();
-    let wifi = wifi(peripherals.modem, sysloop.clone());
+    let _wifi = wifi(peripherals.modem, sysloop.clone());
     let mut led = PinDriver::output(peripherals.pins.gpio2)?;
 
     // Initialize the camera
-    // TODO: toggle frame size and capture interval
-    let result = unsafe { esp_camera_init(&ov2460_config(None, None)) };
+    let mut camera_config = OV2460Config {
+        ..Default::default()
+    };
+
+    let result = unsafe { esp_camera_init(&camera_config.into()) };
     if result != 0 {
         panic!("Camera initialization failed with error {}", result);
     }
@@ -41,9 +44,34 @@ fn main() -> anyhow::Result<()> {
                         led.set_high()?;
                         capture_image();
                         led.set_low();
-                        continue;
                     }
-                    _ => continue, // TODO: other commands
+                    // Message::Resolution(frame_size) => {
+                    //     &camera_config.set_frame_size(frame_size);
+                    //     let result = unsafe { esp_camera_init(&camera_config.into()) };
+                    //     if result != 0 {
+                    //         // TODO: error response
+                    //         eprintln!("failed to reconfigure camera");
+                    //     } else {
+                    //         // TODO: success response
+                    //         // println!("camera: config: {:#?}", &camera_config);
+                    //     }
+                    // }
+                    // Message::Format(pixel_format) => {
+                    //     &camera_config.set_pixel_format(pixel_format);
+                    //     let result = unsafe { esp_camera_init(&camera_config.into()) };
+                    //     if result != 0 {
+                    //         // TODO: error response
+                    //         eprintln!("failed to reconfigure camera");
+                    //     } else {
+                    //         // TODO: success response
+                    //         // println!("camera: config: {:#?}", &camera_config);
+                    //     }
+                    // }
+                    Message::Restart => {
+                        println!("device: restarting");
+                        restart();
+                    }
+                    _ => (),
                 }
             }
             Err(e) => {

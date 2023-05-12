@@ -1,7 +1,6 @@
 use base64::Engine;
 
 use esp_idf_sys::{esp_camera_fb_get, esp_camera_fb_return};
-use std::time::Duration;
 
 pub fn capture_image() {
     // Get the frame buffer from the camera driver
