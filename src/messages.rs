@@ -11,7 +11,6 @@ pub enum Message {
     Capture = 0,
     Format(PixelFormat),
     Resolution(FrameSize),
-    Interval(u8),
     Restart,
 }
 
@@ -35,8 +34,7 @@ impl Message {
                 let frame_size = FrameSize::from(payload);
                 Ok(Message::Resolution(frame_size))
             }
-            3 => Ok(Message::Interval(payload[0])),
-            4 => Ok(Message::Restart),
+            3 => Ok(Message::Restart),
             _ => Err(io::Error::new(
                 io::ErrorKind::InvalidData,
                 "message: invalid header",
@@ -50,7 +48,6 @@ pub enum Response {
     Capture(Vec<u8>) = 0,
     Format(bool),
     Resolution(bool),
-    Interval(bool),
     Restart(bool),
 }
 
