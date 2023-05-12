@@ -2,24 +2,61 @@ use core::convert::From;
 use esp_idf_sys::*;
 use std::os::raw::c_int;
 
-// Pin Assignment for ESP32 WROVER (Freenove)
+const DEFAULT_PIXEL_FORMAT: PixelFormat = PixelFormat::JPEG;
+const DEFAULT_FRAME_SIZE: FrameSize = FrameSize::SVGA;
+const DEFAULT_QUALITY: c_int = 12;
 
-pub const PWDN_GPIO_NUM: c_int = -1;
-pub const RESET_GPIO_NUM: c_int = -1;
-pub const XCLK_GPIO_NUM: c_int = 21;
-pub const SIOD_GPIO_NUM: c_int = 26;
-pub const SIOC_GPIO_NUM: c_int = 27;
-pub const Y9_GPIO_NUM: c_int = 35;
-pub const Y8_GPIO_NUM: c_int = 34;
-pub const Y7_GPIO_NUM: c_int = 39;
-pub const Y6_GPIO_NUM: c_int = 36;
-pub const Y5_GPIO_NUM: c_int = 19;
-pub const Y4_GPIO_NUM: c_int = 18;
-pub const Y3_GPIO_NUM: c_int = 5;
-pub const Y2_GPIO_NUM: c_int = 4;
-pub const VSYNC_GPIO_NUM: c_int = 25;
-pub const HREF_GPIO_NUM: c_int = 23;
-pub const PCLK_GPIO_NUM: c_int = 22;
+pub const WROVER_PINS: PinAssignments = PinAssignments {
+    pwdn_gpio_num: -1,
+    reset_gpio_num: -1,
+    xclk_gpio_num: 21,
+    siod_gpio_num: 26,
+    sioc_gpio_num: 27,
+    y9_gpio_num: 35,
+    y8_gpio_num: 34,
+    y7_gpio_num: 39,
+    y6_gpio_num: 36,
+    y5_gpio_num: 19,
+    y4_gpio_num: 18,
+    y3_gpio_num: 5,
+    y2_gpio_num: 4,
+    vsync_gpio_num: 25,
+    href_gpio_num: 23,
+    pclk_gpio_num: 22,
+};
+
+#[derive(Debug)]
+pub struct PinAssignments {
+    pwdn_gpio_num: c_int,
+    reset_gpio_num: c_int,
+    xclk_gpio_num: c_int,
+    siod_gpio_num: c_int,
+    sioc_gpio_num: c_int,
+    y9_gpio_num: c_int,
+    y8_gpio_num: c_int,
+    y7_gpio_num: c_int,
+    y6_gpio_num: c_int,
+    y5_gpio_num: c_int,
+    y4_gpio_num: c_int,
+    y3_gpio_num: c_int,
+    y2_gpio_num: c_int,
+    vsync_gpio_num: c_int,
+    href_gpio_num: c_int,
+    pclk_gpio_num: c_int,
+}
+
+#[derive(Debug)]
+pub enum Board {
+    WROVER,
+}
+
+impl Board {
+    fn pins(&self) -> &PinAssignments {
+        match self {
+            Board::WROVER => &WROVER_PINS,
+        }
+    }
+}
 
 #[derive(Debug)]
 pub enum PixelFormat {
@@ -144,40 +181,73 @@ impl From<u32> for FrameSize {
     }
 }
 
-pub fn ov2460_config(
-    pixel_format: Option<PixelFormat>,
-    frame_size: Option<FrameSize>,
-) -> camera_config_t {
-    let default_pixel_format = PixelFormat::JPEG;
-    let default_frame_size = FrameSize::SVGA;
-    camera_config_t {
-        pin_pwdn: PWDN_GPIO_NUM,
-        pin_reset: RESET_GPIO_NUM,
-        pin_xclk: XCLK_GPIO_NUM,
-        __bindgen_anon_1: camera_config_t__bindgen_ty_1 {
-            pin_sccb_sda: SIOD_GPIO_NUM,
-        },
-        __bindgen_anon_2: camera_config_t__bindgen_ty_2 {
-            pin_sscb_scl: SIOC_GPIO_NUM,
-        },
-        pin_d7: Y9_GPIO_NUM,
-        pin_d6: Y8_GPIO_NUM,
-        pin_d5: Y7_GPIO_NUM,
-        pin_d4: Y6_GPIO_NUM,
-        pin_d3: Y5_GPIO_NUM,
-        pin_d2: Y4_GPIO_NUM,
-        pin_d1: Y3_GPIO_NUM,
-        pin_d0: Y2_GPIO_NUM,
-        pin_vsync: VSYNC_GPIO_NUM,
-        pin_href: HREF_GPIO_NUM,
-        pin_pclk: PCLK_GPIO_NUM,
-        xclk_freq_hz: 20_000_000,
-        ledc_timer: LedcTimer::Timer0.into(),
-        ledc_channel: LedcChannel::Channel0.into(),
-        pixel_format: pixel_format.unwrap_or(default_pixel_format).into(),
-        frame_size: frame_size.unwrap_or(default_frame_size).into(),
-        jpeg_quality: 12,
-        fb_count: 1,
-        ..Default::default()
+#[derive(Debug)]
+pub struct OV2460Config {
+    pub pixel_format: PixelFormat,
+    pub frame_size: FrameSize,
+    pub board: Board,
+}
+
+impl Into<camera_config_t> for OV2460Config {
+    fn into(self) -> camera_config_t {
+        let pins = self.board.pins();
+        camera_config_t {
+            pin_pwdn: pins.pwdn_gpio_num,
+            pin_reset: pins.reset_gpio_num,
+            pin_xclk: pins.xclk_gpio_num,
+            __bindgen_anon_1: camera_config_t__bindgen_ty_1 {
+                pin_sccb_sda: pins.siod_gpio_num,
+            },
+            __bindgen_anon_2: camera_config_t__bindgen_ty_2 {
+                pin_sscb_scl: pins.sioc_gpio_num,
+            },
+            pin_d7: pins.y9_gpio_num,
+            pin_d6: pins.y8_gpio_num,
+            pin_d5: pins.y7_gpio_num,
+            pin_d4: pins.y6_gpio_num,
+            pin_d3: pins.y5_gpio_num,
+            pin_d2: pins.y4_gpio_num,
+            pin_d1: pins.y3_gpio_num,
+            pin_d0: pins.y2_gpio_num,
+            pin_vsync: pins.vsync_gpio_num,
+            pin_href: pins.href_gpio_num,
+            pin_pclk: pins.pclk_gpio_num,
+            xclk_freq_hz: 20_000_000,
+            ledc_timer: LedcTimer::Timer0.into(),
+            ledc_channel: LedcChannel::Channel0.into(),
+            pixel_format: self.pixel_format.into(),
+            frame_size: self.frame_size.into(),
+            jpeg_quality: DEFAULT_QUALITY, // TODO: make configurable
+            fb_count: 1,
+            ..Default::default()
+        }
+    }
+}
+
+impl Default for OV2460Config {
+    fn default() -> Self {
+        Self {
+            pixel_format: DEFAULT_PIXEL_FORMAT,
+            frame_size: DEFAULT_FRAME_SIZE,
+            board: Board::WROVER,
+        }
+    }
+}
+
+impl OV2460Config {
+    fn new(pixel_format: PixelFormat, frame_size: FrameSize, board: Board) -> Self {
+        OV2460Config {
+            pixel_format,
+            frame_size,
+            board,
+        }
+    }
+
+    pub fn set_pixel_format(&mut self, pixel_format: PixelFormat) {
+        self.pixel_format = pixel_format;
+    }
+
+    pub fn set_frame_size(&mut self, frame_size: FrameSize) {
+        self.frame_size = frame_size;
     }
 }
