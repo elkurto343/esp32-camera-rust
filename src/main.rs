@@ -47,6 +47,7 @@ fn main() -> anyhow::Result<()> {
                     }
                     // Message::Resolution(frame_size) => {
                     //     &camera_config.set_frame_size(frame_size);
+                    //     // TODO: fix borrow checker issue
                     //     let result = unsafe { esp_camera_init(&camera_config.into()) };
                     //     if result != 0 {
                     //         // TODO: error response
@@ -58,6 +59,7 @@ fn main() -> anyhow::Result<()> {
                     // }
                     // Message::Format(pixel_format) => {
                     //     &camera_config.set_pixel_format(pixel_format);
+                    //     // TODO: fix borrow checker issue
                     //     let result = unsafe { esp_camera_init(&camera_config.into()) };
                     //     if result != 0 {
                     //         // TODO: error response
