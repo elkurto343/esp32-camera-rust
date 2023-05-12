@@ -40,6 +40,18 @@ impl From<PixelFormat> for u32 {
     }
 }
 
+impl From<u32> for PixelFormat {
+    fn from(value: u32) -> Self {
+        match value {
+            pixformat_t_PIXFORMAT_GRAYSCALE => PixelFormat::GRAYSCALE,
+            pixformat_t_PIXFORMAT_RGB565 => PixelFormat::RGB565,
+            pixformat_t_PIXFORMAT_YUV422 => PixelFormat::YUV422,
+            pixformat_t_PIXFORMAT_JPEG => PixelFormat::JPEG,
+            _ => panic!("Invalid value for PixelFormat"),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum LedcChannel {
     Channel0,
@@ -111,6 +123,23 @@ impl From<FrameSize> for u32 {
             FrameSize::XGA => framesize_t_FRAMESIZE_XGA,
             FrameSize::SXGA => framesize_t_FRAMESIZE_SXGA,
             FrameSize::UXGA => framesize_t_FRAMESIZE_UXGA,
+        }
+    }
+}
+
+impl From<u32> for FrameSize {
+    fn from(value: u32) -> Self {
+        match value {
+            framesize_t_FRAMESIZE_QQVGA => FrameSize::QQVGA,
+            framesize_t_FRAMESIZE_QCIF => FrameSize::QCIF,
+            framesize_t_FRAMESIZE_QVGA => FrameSize::QVGA,
+            framesize_t_FRAMESIZE_CIF => FrameSize::CIF,
+            framesize_t_FRAMESIZE_VGA => FrameSize::VGA,
+            framesize_t_FRAMESIZE_SVGA => FrameSize::SVGA,
+            framesize_t_FRAMESIZE_XGA => FrameSize::XGA,
+            framesize_t_FRAMESIZE_SXGA => FrameSize::SXGA,
+            framesize_t_FRAMESIZE_UXGA => FrameSize::UXGA,
+            _ => panic!("Invalid value for FrameSize"),
         }
     }
 }

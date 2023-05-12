@@ -1,10 +1,8 @@
 use esp_idf_hal::{gpio::PinDriver, peripherals::Peripherals};
-use esp_idf_svc;
 use esp_idf_svc::eventloop::EspSystemEventLoop;
 use esp_idf_sys::{self as _, esp_camera_fb_get, esp_camera_fb_return, esp_camera_init};
 
-use std::thread;
-use std::time::Duration;
+use std::{net::TcpListener, thread, time::Duration};
 
 use base64::Engine;
 
@@ -14,16 +12,15 @@ use ov2460_config::ov2460_config;
 mod wifi;
 use wifi::wifi;
 
-// const LED_BUILTIN = 2;
+mod messages;
+use messages::handle_message;
 
 fn main() -> anyhow::Result<()> {
     esp_idf_sys::link_patches();
 
     let sysloop = EspSystemEventLoop::take()?;
     let peripherals = Peripherals::take().unwrap();
-    let mut wifi = wifi(peripherals.modem, sysloop.clone());
-
-    // TODO: how to make this use constant
+    let wifi = wifi(peripherals.modem, sysloop.clone());
     let mut led = PinDriver::output(peripherals.pins.gpio2)?;
 
     // Initialize the camera
@@ -31,6 +28,18 @@ fn main() -> anyhow::Result<()> {
     let result = unsafe { esp_camera_init(&ov2460_config(None, None)) };
     if result != 0 {
         panic!("Camera initialization failed with error {}", result);
+    }
+
+    let listener = TcpListener::bind("0.0.0.0:8080")?;
+    for stream in listener.incoming() {
+        match stream {
+            Ok(mut stream) => {
+                handle_message(stream);
+            }
+            Err(e) => {
+                println!("tcp: error {:#?}", e)
+            }
+        }
     }
 
     loop {

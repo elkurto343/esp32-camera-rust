@@ -1,5 +1,5 @@
 use esp_idf_hal::{modem::Modem, peripheral::Peripheral};
-use esp_idf_svc::netif::EspNetifWait;
+// use esp_idf_svc::netif::EspNetifWait;
 use esp_idf_svc::{
     eventloop::EspSystemEventLoop,
     wifi::{EspWifi, WifiWait},
