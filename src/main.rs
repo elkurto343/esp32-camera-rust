@@ -11,7 +11,7 @@ mod wifi;
 use wifi::wifi;
 
 mod messages;
-use messages::{handle_message, Message};
+use messages::{handle_message, Instruction};
 
 mod camera;
 use camera::capture_image;
@@ -40,12 +40,12 @@ fn main() -> anyhow::Result<()> {
             Ok(mut stream) => {
                 let message = handle_message(stream).unwrap();
                 match message {
-                    Message::Capture => {
+                    Instruction::Capture => {
                         led.set_high()?;
                         capture_image();
-                        led.set_low();
+                        led.set_low()?;
                     }
-                    // Message::Resolution(frame_size) => {
+                    // Instruction::Resolution(frame_size) => {
                     //     &camera_config.set_frame_size(frame_size);
                     //     // TODO: fix borrow checker issue
                     //     let result = unsafe { esp_camera_init(&camera_config.into()) };
@@ -57,7 +57,7 @@ fn main() -> anyhow::Result<()> {
                     //         // println!("camera: config: {:#?}", &camera_config);
                     //     }
                     // }
-                    // Message::Format(pixel_format) => {
+                    // Instruction::Format(pixel_format) => {
                     //     &camera_config.set_pixel_format(pixel_format);
                     //     // TODO: fix borrow checker issue
                     //     let result = unsafe { esp_camera_init(&camera_config.into()) };
@@ -69,7 +69,7 @@ fn main() -> anyhow::Result<()> {
                     //         // println!("camera: config: {:#?}", &camera_config);
                     //     }
                     // }
-                    Message::Restart => {
+                    Instruction::Restart => {
                         println!("device: restarting");
                         restart();
                     }

@@ -25,6 +25,7 @@ pub const WROVER_PINS: PinAssignments = PinAssignments {
     pclk_gpio_num: 22,
 };
 
+// TODO: consolidate board pins vs camera pins
 #[derive(Debug)]
 pub struct PinAssignments {
     pwdn_gpio_num: c_int,
