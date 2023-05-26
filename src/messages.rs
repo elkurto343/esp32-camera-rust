@@ -5,7 +5,7 @@ use std::{
 
 use crate::ov2460_config::{FrameSize, PixelFormat};
 
-// TODO: replace with protobuf?
+// TODO: refactor to use https://github.com/dylanmckay/protocol or protobufs?
 
 #[repr(u8)]
 #[derive(Debug)]
