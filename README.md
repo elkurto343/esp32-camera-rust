@@ -18,6 +18,7 @@ _Note: my test device is actually a `Freenove` not the common `ESP32-Cam` so the
 
 Your aim and approach for using an ESP32 and a camera module are probably different to mine.
 The following commands are a quick start for setting up a blank project with the camera module Rust bindings ready to go.
+Hopefully it helps someone hit the ground running.
 
 First setup `espup` and the toolchain, and be sure to set env vars before compiling:
 `. ~/export-esp.sh`
@@ -35,7 +36,7 @@ echo '#include "esp32-camera/driver/include/esp_camera.h"' > esp32-camera-bindin
 echo 'CONFIG_ESP32_SPIRAM_SUPPORT=y' >> sdkconfig.defaults
 ```
 
-Edit `Cargo.toml` and set:
+Edit `Cargo.toml` and configure an extra component (`esp-idf-sys` handles bindgen):
 
 ```toml
 [package.metadata.esp-idf-sys]
