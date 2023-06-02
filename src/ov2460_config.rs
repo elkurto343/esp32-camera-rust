@@ -59,6 +59,7 @@ impl Board {
     }
 }
 
+// OV2460 supported pixel formats encapsulated in a Rust enum with transforms
 #[derive(Debug)]
 pub enum PixelFormat {
     GRAYSCALE, // Grayscale, 1 byte per pixel
@@ -136,6 +137,7 @@ impl From<LedcTimer> for u32 {
     }
 }
 
+// ESP32 supported image resolutions encapsulated in a Rust enum with transforms
 #[derive(Debug)]
 pub enum FrameSize {
     QQVGA, // Quarter Quarter VGA, 160 x 120, 28.8 kbps
@@ -182,6 +184,7 @@ impl From<u32> for FrameSize {
     }
 }
 
+// OV2460 configuration struct for direct use with esp32-camera library via transform
 #[derive(Debug)]
 pub struct OV2460Config {
     pub pixel_format: PixelFormat,
@@ -225,6 +228,7 @@ impl Into<camera_config_t> for OV2460Config {
     }
 }
 
+// Configuration defaults
 impl Default for OV2460Config {
     fn default() -> Self {
         Self {
@@ -235,6 +239,7 @@ impl Default for OV2460Config {
     }
 }
 
+// Associated methods for instantiation or property mutation
 impl OV2460Config {
     fn new(pixel_format: PixelFormat, frame_size: FrameSize, board: Board) -> Self {
         OV2460Config {

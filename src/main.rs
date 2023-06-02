@@ -19,8 +19,11 @@ use camera::capture_image;
 fn main() -> anyhow::Result<()> {
     esp_idf_sys::link_patches();
 
+    // Initialize general hardware
     let sysloop = EspSystemEventLoop::take()?;
     let peripherals = Peripherals::take().unwrap();
+
+    // Initialize wifi
     let _wifi = wifi(peripherals.modem, sysloop.clone());
     let mut led = PinDriver::output(peripherals.pins.gpio2)?;
 
@@ -34,6 +37,7 @@ fn main() -> anyhow::Result<()> {
         panic!("Camera initialization failed with error {}", result);
     }
 
+    // Listen to TCP for packets
     let listener = TcpListener::bind("0.0.0.0:8080")?;
     for stream in listener.incoming() {
         match stream {
@@ -41,8 +45,11 @@ fn main() -> anyhow::Result<()> {
                 let message = handle_message(stream).unwrap();
                 match message {
                     Instruction::Capture => {
+                        // Turn LED on while image is being captured
                         led.set_high()?;
+                        // Capture image using camera
                         capture_image();
+                        // Turn LED back off after image capture completes
                         led.set_low()?;
                     }
                     // Instruction::Resolution(frame_size) => {
@@ -70,6 +77,7 @@ fn main() -> anyhow::Result<()> {
                     //     }
                     // }
                     Instruction::Restart => {
+                        // When in doubt.. restart your way out
                         println!("device: restarting");
                         restart();
                     }

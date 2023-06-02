@@ -2,6 +2,7 @@ use base64::Engine;
 
 use esp_idf_sys::{esp_camera_fb_get, esp_camera_fb_return};
 
+// Capture image using camera module
 pub fn capture_image() {
     // Get the frame buffer from the camera driver
     let fb = unsafe { esp_camera_fb_get() };

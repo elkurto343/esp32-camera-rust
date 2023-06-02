@@ -16,6 +16,7 @@ pub struct Config {
     pass: &'static str,
 }
 
+// Loads `cfg.toml` and connects the ESP32 to the specified wifi network
 pub fn wifi(
     modem: impl Peripheral<P = Modem> + 'static,
     sysloop: EspSystemEventLoop,
@@ -60,6 +61,7 @@ pub fn wifi(
 
     wifi.connect()?;
 
+    // TODO: fix
     // if !EspNetifWait::new::<EspNetif>(wifi.sta_netif(), &sysloop)?.wait_with_timeout(
     //     Duration::from_secs(20),
     //     || {

@@ -7,6 +7,7 @@ use crate::ov2460_config::{FrameSize, PixelFormat};
 
 // TODO: refactor to use https://github.com/dylanmckay/protocol or protobufs?
 
+// Packet format for controlling the ESP32
 #[repr(u8)]
 #[derive(Debug)]
 pub enum Instruction {
@@ -17,6 +18,7 @@ pub enum Instruction {
 }
 
 impl Instruction {
+    // Deserialize an instruction packet from TCPStream
     fn from_stream(mut stream: TcpStream) -> io::Result<Self> {
         let mut buf = [0; 5];
         stream.read_exact(&mut buf).unwrap();
@@ -45,6 +47,7 @@ impl Instruction {
     }
 }
 
+// TODO: Packet format for ESP32 responses
 #[repr(u8)]
 #[derive(Debug)]
 pub enum InstructionResult {
@@ -54,6 +57,7 @@ pub enum InstructionResult {
     Restart(bool),
 }
 
+// Handler reads and deserializes incoming packets
 pub fn handle_message(mut stream: TcpStream) -> io::Result<Instruction> {
     println!("tcp: received message from {}", stream.peer_addr().unwrap());
 
