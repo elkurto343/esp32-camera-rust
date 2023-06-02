@@ -22,12 +22,12 @@ fn main() -> anyhow::Result<()> {
     // Initialize general hardware
     let sysloop = EspSystemEventLoop::take()?;
     let peripherals = Peripherals::take().unwrap();
+    let mut led = PinDriver::output(peripherals.pins.gpio2)?; // board's builtin LED
 
     // Initialize wifi
     let _wifi = wifi(peripherals.modem, sysloop.clone());
-    let mut led = PinDriver::output(peripherals.pins.gpio2)?;
 
-    // Initialize the camera
+    // Initialize the camera with default config
     let mut camera_config = OV2460Config {
         ..Default::default()
     };
@@ -37,12 +37,13 @@ fn main() -> anyhow::Result<()> {
         panic!("Camera initialization failed with error {}", result);
     }
 
-    // Listen to TCP for packets
+    // Listen to TCP for instruction packets
     let listener = TcpListener::bind("0.0.0.0:8080")?;
     for stream in listener.incoming() {
         match stream {
             Ok(mut stream) => {
                 let message = handle_message(stream).unwrap();
+                // TODO: encapsulate instruction handlers
                 match message {
                     Instruction::Capture => {
                         // Turn LED on while image is being captured
