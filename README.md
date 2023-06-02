@@ -4,9 +4,11 @@ This is a pet project for learning the Rust language and using it on an ESP32 mi
 The aim is to have the device take images of a garage door on-demand so I can remotely check if I forgot to close it.
 
 A central controller (todo) running on a separate single-board computer will be responsible for receiving requests
-from mobile devices and dispatching relevant commands to the microcontroller. The architecture is effectively:
+from mobile devices and dispatching relevant commands to the microcontroller.
 
-- Mobile App <-HTTP-> Central Controller (SBC) <-TCPIP-> ESP32+Camera
+The aim is to communicate with the microcontroller directly via TCP. HTTP packet structure is unnecessary overhead.
+
+- Mobile App <-HTTP-> Central Controller (SBC) <-TCP-> ESP32+Camera
 
 ### ESP32
 
