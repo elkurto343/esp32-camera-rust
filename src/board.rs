@@ -95,6 +95,7 @@ pub struct DvpPins {
 pub enum Board {
     Freenove,
     AIThinker,
+    Custom(DvpPins),
 }
 
 impl Board {
@@ -102,6 +103,7 @@ impl Board {
         match self {
             Board::Freenove => FREENOVE_DVP_PINS,
             Board::AIThinker => AITHINKER_DVP_PINS,
+            Board::Custom(dvp_pins) => dvp_pins,
         }
     }
 }
