@@ -3,7 +3,7 @@ use std::{
     net::TcpStream,
 };
 
-use crate::ov2460_config::{FrameSize, PixelFormat};
+use crate::camera::{FrameSize, PixelFormat};
 
 // TODO: refactor to use https://github.com/dylanmckay/protocol or protobufs?
 
@@ -61,7 +61,7 @@ pub enum InstructionResult {
 pub fn handle_message(mut stream: TcpStream) -> io::Result<Instruction> {
     println!("tcp: received message from {}", stream.peer_addr().unwrap());
 
-    let message = Instruction::from_stream(stream).unwrap();
+    let message = Instruction::from_stream(stream)?;
     println!("message: {:#?}", message);
 
     Ok(message)
