@@ -1,6 +1,7 @@
 ## About
 
-This is a pet project for learning the Rust language and using it on an ESP32 microcontroller device with OV2460 camera module.
+
+This is a pet project for learning the Rust language and using it on an ESP32 microcontroller device with camera module.
 The aim is to have the device take images of a garage door on-demand so I can remotely check if I forgot to close it.
 
 A central controller (todo) running on a separate single-board computer will be responsible for receiving requests
@@ -10,11 +11,17 @@ The aim is to communicate with the microcontroller directly via TCP. HTTP packet
 
 - Mobile App <-HTTP-> Central Controller (SBC) <-TCP-> ESP32+Camera
 
-### ESP32
+## Hardware
 
-![ESP32-Cam](./static/readme-esp32-cam.jpg)
+![ESP32-Cam](./static/readme-freenove-aithinker-boards.jpg)
 
-_Note: my test device is actually a `Freenove` not the common `ESP32-Cam` so the pin mapping is different._
+This projects currently supports two variants of ESP32 board:
+- Freenove WROVER
+- AIThinker WROOM
+
+And two camera modules:
+- OV2640
+- OV5640
 
 ## Starting a blank project with `esp32-camera` bindings
 
