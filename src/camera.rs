@@ -171,8 +171,8 @@ impl CameraSensor {
         let pixel_format = pixel_format.unwrap_or_default();
         let frame_size = frame_size.unwrap_or_default();
 
+        let pins = dvp_pins;
         let result = unsafe {
-            let pins = dvp_pins;
             // TODO: remove the need for this
             esp_camera_init(&camera_config_t {
                 pin_pwdn: pins.pwdn,
@@ -219,15 +219,33 @@ impl CameraSensor {
         }
     }
 
-    pub fn set_pixel_format(&mut self, pixel_format: PixelFormat) {
-        self.pixel_format = pixel_format;
-    }
+    // TODO: the sensor functions are added to esp32-camera as conditional includes (via macro)
+    // and bindings are not generated for them. Unsure if/how it's possible to expose them. Adding
+    // `CONFIG_OV2640_SUPPORT=y` to `sdkconfig.defaults` seems to have no effect.
+    // Alternative option is to deinit and re-init every time we want to change the format.
 
-    pub fn set_frame_size(&mut self, frame_size: FrameSize) {
-        self.frame_size = frame_size;
-    }
+    // pub fn set_pixel_format(&mut self, pixel_format: PixelFormat) {
+    //     self.pixel_format = pixel_format;
+    //     let mut sensor = unsafe { esp_camera_sensor_get() };
+    //     let result = unsafe { (*sensor).set_pixformat(sensor, pixel_format.clone().into()) };
+    //     // if result != 0 {}
+    // }
+
+    // pub fn set_frame_size(&mut self, framesize: FrameSize) {
+    //     self.frame_size = framesize;
+    //     let sensor: *mut sensor_t = unsafe { esp_camera_sensor_get() };
+    //
+    //     let result = unsafe { set_framesize(*sensor, framesize.clone().into()) };
+    //     // if result != 0 {}
+    //
+    //     // if self.pixel_format == PixelFormat::JPEG {
+    //     // let result = unsafe { *sensor.set_framesize(sensor, framesize.into()) };
+    //     // Handle the result if needed
+    //     // }
+    // }
 
     // pub fn set_jpeg_quality(&mut self, jpeg_quality: JpegQuality) {
+    //     // min: 0, max: 63
     //     self.jpeg_quality = jpeg_quality;
     // }
 
