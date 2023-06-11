@@ -17,9 +17,11 @@ pub enum Instruction {
     Restart,
 }
 
-impl Instruction {
+impl TryFrom<TcpStream> for Instruction {
+    type Error = io::Error;
+
     // Deserialize an instruction packet from TCPStream
-    fn from_stream(mut stream: TcpStream) -> io::Result<Self> {
+    fn try_from(mut stream: TcpStream) -> io::Result<Self> {
         let mut buf = [0; 5];
         stream.read_exact(&mut buf).unwrap();
 
@@ -55,14 +57,4 @@ pub enum InstructionResult {
     Format(bool),
     Resolution(bool),
     Restart(bool),
-}
-
-// Handler reads and deserializes incoming packets
-pub fn handle_message(mut stream: TcpStream) -> io::Result<Instruction> {
-    println!("tcp: received message from {}", stream.peer_addr().unwrap());
-
-    let message = Instruction::from_stream(stream)?;
-    println!("message: {:#?}", message);
-
-    Ok(message)
 }

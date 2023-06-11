@@ -39,6 +39,7 @@ const AITHINKER_DVP_PINS: DvpPins = DvpPins {
 };
 
 // Pin assignment for MIPI interface
+#[derive(Debug)]
 pub struct MipiPins {
     // Power down
     pub pwdn: c_int,
@@ -60,8 +61,9 @@ pub struct MipiPins {
     pub d4: c_int,
 }
 
+// TODO: replace Clone + Copy trait and pass via reference
 // Pin assignment for DVP interface
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct DvpPins {
     // Power down
     pub pwdn: c_int,

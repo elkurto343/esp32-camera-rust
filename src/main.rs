@@ -8,7 +8,7 @@ mod wifi;
 use wifi::wifi;
 
 mod messages;
-use messages::{handle_message, Instruction};
+use messages::Instruction;
 
 mod camera;
 use camera::CameraSensor;
@@ -22,6 +22,7 @@ fn main() -> anyhow::Result<()> {
     // Initialize general hardware
     let sysloop = EspSystemEventLoop::take()?;
     let peripherals = Peripherals::take().unwrap();
+    // TODO: not all boards will have builtin led
     let mut led = PinDriver::output(peripherals.pins.gpio2)?; // board's builtin LED
     let board = Board::Freenove;
 
@@ -37,7 +38,10 @@ fn main() -> anyhow::Result<()> {
     for stream in listener.incoming() {
         match stream {
             Ok(mut stream) => {
-                let message = handle_message(stream);
+                println!("tcp: received message from {}", stream.peer_addr().unwrap());
+                let message = Instruction::try_from(stream);
+                println!("message: {:#?}", message);
+
                 // TODO: encapsulate instruction handlers
                 match message {
                     Err(err) => println!("error parsing packet: {:#?}", err),
