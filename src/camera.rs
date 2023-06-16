@@ -222,7 +222,8 @@ impl CameraSensor {
     // TODO: the sensor functions are added to esp32-camera as conditional includes (via macro)
     // and bindings are not generated for them. Unsure if/how it's possible to expose them. Adding
     // `CONFIG_OV2640_SUPPORT=y` to `sdkconfig.defaults` seems to have no effect.
-    // Alternative option is to deinit and re-init every time we want to change the format.
+    // Alternative option is to deinit and re-init every time we want to change the format. 💩
+    // Second alternative option is to port those functions to rust and make them sensor agnostic. 🪨
 
     // pub fn set_pixel_format(&mut self, pixel_format: PixelFormat) {
     //     self.pixel_format = pixel_format;
