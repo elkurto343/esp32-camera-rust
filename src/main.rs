@@ -4,17 +4,15 @@ use esp_idf_sys::{self as _};
 
 use std::net::TcpListener;
 
-mod wifi;
-use wifi::wifi;
-
-mod messages;
-use messages::Instruction;
-
-mod camera;
-use camera::CameraSensor;
-
 mod board;
+mod camera;
+mod packet;
+mod wifi;
+
 use board::Board;
+use camera::CameraSensor;
+use packet::IncomingPacket;
+use wifi::init_wifi;
 
 fn main() -> anyhow::Result<()> {
     esp_idf_sys::link_patches();
@@ -27,7 +25,9 @@ fn main() -> anyhow::Result<()> {
     let board = Board::Freenove;
 
     // Initialize wifi
-    let _wifi = wifi(peripherals.modem, sysloop.clone());
+    let wifi_ssid = env!("WIFI_SSID");
+    let wifi_pass = env!("WIFI_PASS");
+    let _wifi = init_wifi(wifi_ssid, wifi_pass, peripherals.modem, sysloop.clone());
 
     // TODO: let Board handle camera instantiation
     // Initialize the camera with default config
@@ -38,14 +38,14 @@ fn main() -> anyhow::Result<()> {
     for stream in listener.incoming() {
         match stream {
             Ok(mut stream) => {
-                println!("tcp: received message from {}", stream.peer_addr().unwrap());
-                let message = Instruction::try_from(stream);
-                println!("message: {:#?}", message);
+                println!("tcp: received packet from {}", stream.peer_addr().unwrap());
+                let packet = IncomingPacket::try_from(stream);
+                println!("packet: {:#?}", packet);
 
                 // TODO: encapsulate instruction handlers
-                match message {
+                match packet {
                     Err(err) => println!("error parsing packet: {:#?}", err),
-                    Ok(Instruction::Capture) => {
+                    Ok(IncomingPacket::Capture) => {
                         // Turn LED on while image is being captured
                         led.set_high()?;
                         // Capture image using camera
@@ -53,36 +53,16 @@ fn main() -> anyhow::Result<()> {
                         // Turn LED back off after image capture completes
                         led.set_low()?;
                     }
-                    // Ok(Instruction::Resolution(frame_size)) => {
-                    //     &camera_config.set_frame_size(frame_size);
-                    //     // TODO: fix borrow checker issue
-                    //     let result = unsafe { esp_camera_init(&camera_config.into()) };
-                    //     if result != 0 {
-                    //         // TODO: error response
-                    //         eprintln!("failed to reconfigure camera");
-                    //     } else {
-                    //         // TODO: success response
-                    //         // println!("camera: config: {:#?}", &camera_config);
-                    //     }
-                    // }
-                    // Ok(Instruction::Format(pixel_format)) => {
-                    //     &camera_config.set_pixel_format(pixel_format);
-                    //     // TODO: fix borrow checker issue
-                    //     let result = unsafe { esp_camera_init(&camera_config.into()) };
-                    //     if result != 0 {
-                    //         // TODO: error response
-                    //         eprintln!("failed to reconfigure camera");
-                    //     } else {
-                    //         // TODO: success response
-                    //         // println!("camera: config: {:#?}", &camera_config);
-                    //     }
-                    // }
-                    Ok(Instruction::Restart) => {
-                        // When in doubt.. restart your way out
-                        println!("device: restarting");
+                    Ok(IncomingPacket::SetFrameSize(frame_size)) => {
+                        println!("todo: set resolution")
+                    }
+                    Ok(IncomingPacket::SetPixelFormat(pixel_format)) => {
+                        println!("todo: set pixel format")
+                    }
+                    Ok(IncomingPacket::Restart) => {
+                        println!("device: restarting"); // When in doubt.. restart your way out
                         restart();
                     }
-                    _ => (), // commented instructions
                 }
             }
             Err(e) => {

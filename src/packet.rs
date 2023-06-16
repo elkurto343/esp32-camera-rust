@@ -5,19 +5,17 @@ use std::{
 
 use crate::camera::{FrameSize, PixelFormat};
 
-// TODO: refactor to use https://github.com/dylanmckay/protocol or protobufs?
-
-// Packet format for controlling the ESP32
+// Packets for controlling/configuring the ESP32
 #[repr(u8)]
 #[derive(Debug)]
-pub enum Instruction {
+pub enum IncomingPacket {
     Capture = 0,
-    Format(PixelFormat),
-    Resolution(FrameSize),
+    SetPixelFormat(PixelFormat),
+    SetFrameSize(FrameSize),
     Restart,
 }
 
-impl TryFrom<TcpStream> for Instruction {
+impl TryFrom<TcpStream> for IncomingPacket {
     type Error = io::Error;
 
     // Deserialize an instruction packet from TCPStream
@@ -25,22 +23,24 @@ impl TryFrom<TcpStream> for Instruction {
         let mut buf = [0; 5];
         stream.read_exact(&mut buf).unwrap();
 
+        // Note: the packet format is effectively a header byte used for identifying the packet
+        // type followed by optional payload bytes (currently max 4)
         let header = buf[0];
         let payload = &buf[1..5];
 
         match header {
-            0 => Ok(Instruction::Capture),
+            0 => Ok(IncomingPacket::Capture),
             1 => {
                 let payload: u32 = u32::from_be_bytes(payload.try_into().unwrap());
                 let pixel_format = PixelFormat::from(payload);
-                Ok(Instruction::Format(pixel_format))
+                Ok(IncomingPacket::SetPixelFormat(pixel_format))
             }
             2 => {
                 let payload: u32 = u32::from_be_bytes(payload.try_into().unwrap());
                 let frame_size = FrameSize::from(payload);
-                Ok(Instruction::Resolution(frame_size))
+                Ok(IncomingPacket::SetFrameSize(frame_size))
             }
-            3 => Ok(Instruction::Restart),
+            3 => Ok(IncomingPacket::Restart),
             _ => Err(io::Error::new(
                 io::ErrorKind::InvalidData,
                 "message: invalid header",
@@ -52,9 +52,10 @@ impl TryFrom<TcpStream> for Instruction {
 // TODO: Packet format for ESP32 responses
 #[repr(u8)]
 #[derive(Debug)]
-pub enum InstructionResult {
+pub enum OutgoingPacket {
     Capture(Vec<u8>) = 0,
-    Format(bool),
-    Resolution(bool),
+    SetPixelFormat(bool),
+    SetFrameSize(bool),
     Restart(bool),
+    // TODO: Error
 }
