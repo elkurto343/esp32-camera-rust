@@ -33,6 +33,7 @@ esp-idf-hal = { git = "https://github.com/benji343/esp-idf-hal-camera-fix" }
 [build-dependencies]
 anyhow = "1.0.71"
 embuild = "0.31.1" 
+dotenv-build = "0.1.1"
 
 [package.metadata.esp-idf-sys]
 extra_components = [

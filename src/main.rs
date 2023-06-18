@@ -1,9 +1,9 @@
-use esp_idf_hal::{gpio::PinDriver, peripherals::Peripherals, reset::restart};
-use esp_idf_svc::eventloop::EspSystemEventLoop;
-use esp_idf_sys::{self as _};
-
 use std::io::Write;
 use std::net::TcpListener;
+
+use esp_idf_hal::{peripherals::Peripherals, reset::restart};
+use esp_idf_svc::eventloop::EspSystemEventLoop;
+use esp_idf_sys::{self as _};
 
 mod board;
 mod camera;
@@ -18,25 +18,13 @@ use wifi::init_wifi;
 fn main() -> anyhow::Result<()> {
     esp_idf_sys::link_patches();
 
-    // TODO: `Board::from_env()` can load board variant and potentially custom pin assignments
-    // internally
-    let board = env!("ESP32_BOARD");
-    let board = match board {
-        "Freenove" => Board::Freenove,
-        "AIThinker" => Board::AIThinker,
-        // TODO: "Custom"
-        _ => panic!("env var: invalid board specified"),
-    };
-
     // Initialize general hardware
     let sysloop = EspSystemEventLoop::take()?;
     let peripherals = Peripherals::take().unwrap();
-    let mut led = match board {
-        Board::Freenove => Some(PinDriver::output(peripherals.pins.gpio2).unwrap()),
-        _ => None,
-    };
+    let board = Board::from_env();
 
     // Initialize wifi
+    // TODO: encrypt secrets in binary
     let wifi_ssid = env!("WIFI_SSID");
     let wifi_pass = env!("WIFI_PASS");
     let _wifi = init_wifi(wifi_ssid, wifi_pass, peripherals.modem, sysloop.clone());
@@ -57,11 +45,7 @@ fn main() -> anyhow::Result<()> {
                 // TODO: encapsulate instruction handlers
                 match packet {
                     Ok(IncomingPacket::Capture) => {
-                        // Capture image while illuminating specified LED
-                        // led.unwrap().set_high()?;
                         let image = camera_sensor.capture_image(true).unwrap();
-                        // led.unwrap().set_low()?;
-
                         stream.write_all(image);
                         stream.flush();
                     }

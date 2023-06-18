@@ -1,5 +1,7 @@
 use std::os::raw::c_int;
 
+// TODO: refactor and move board constants to their own files
+
 const FREENOVE_DVP_PINS: DvpPins = DvpPins {
     pwdn: -1,
     rst: -1,
@@ -106,6 +108,42 @@ impl Board {
             Board::Freenove => FREENOVE_DVP_PINS,
             Board::AIThinker => AITHINKER_DVP_PINS,
             Board::Custom(dvp_pins) => dvp_pins,
+        }
+    }
+
+    // pub fn camera_activity_led(&pins: gpio::Pins) -> Option<PinDriver> {
+    //     match self {
+    //         Board::Freenove => Some(PinDriver::output(&pins.gpio2).unwrap()),
+    //         Board::AIThinker => None,
+    //         // TODO:
+    //         // Board::Custom(dvp_pins, cam_act_led) => cam_act_led,
+    //         Board::Custom(_) => None,
+    //     }
+    // }
+
+    pub fn from_env() -> Self {
+        match env!("BOARD_MODEL") {
+            "Freenove" => Board::Freenove,
+            "AIThinker" => Board::AIThinker,
+            // _ => Board::Custom(DvpPins {
+            //     pwdn: env!("BOARD_CAM_PWDN").try_into().unwrap(),
+            //     rst: env!("BOARD_CAM_RST").try_into().unwrap(),
+            //     xclk: env!("BOARD_CAM_XCLK").try_into().unwrap(),
+            //     pclk: env!("BOARD_CAM_PCLK").try_into().unwrap(),
+            //     vsync: env!("BOARD_CAM_VSYNC").try_into().unwrap(),
+            //     href: env!("BOARD_CAM_HREF").try_into().unwrap(),
+            //     sda: env!("BOARD_CAM_SDA").try_into().unwrap(),
+            //     scl: env!("BOARD_CAM_SCL").try_into().unwrap(),
+            //     d7: env!("BOARD_CAM_D7").try_into().unwrap(),
+            //     d6: env!("BOARD_CAM_D6").try_into().unwrap(),
+            //     d5: env!("BOARD_CAM_D5").try_into().unwrap(),
+            //     d4: env!("BOARD_CAM_D4").try_into().unwrap(),
+            //     d3: env!("BOARD_CAM_D3").try_into().unwrap(),
+            //     d2: env!("BOARD_CAM_D2").try_into().unwrap(),
+            //     d1: env!("BOARD_CAM_D1").try_into().unwrap(),
+            //     d0: env!("BOARD_CAM_D0").try_into().unwrap(),
+            // }),
+            _ => panic!("env var: invalid board specified"),
         }
     }
 }
