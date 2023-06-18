@@ -5,3 +5,5 @@
 /esp32-camera
 /cfg.toml
 .env
+/captures
+.DS_Store
