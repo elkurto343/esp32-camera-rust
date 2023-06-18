@@ -2,6 +2,7 @@ use esp_idf_hal::{gpio::PinDriver, peripherals::Peripherals, reset::restart};
 use esp_idf_svc::eventloop::EspSystemEventLoop;
 use esp_idf_sys::{self as _};
 
+use std::io::Write;
 use std::net::TcpListener;
 
 mod board;
@@ -11,7 +12,7 @@ mod wifi;
 
 use board::Board;
 use camera::CameraSensor;
-use packet::IncomingPacket;
+use packet::{IncomingPacket, OutgoingPacket};
 use wifi::init_wifi;
 
 fn main() -> anyhow::Result<()> {
@@ -50,19 +51,21 @@ fn main() -> anyhow::Result<()> {
         match stream {
             Ok(mut stream) => {
                 println!("tcp: received packet from {}", stream.peer_addr().unwrap());
-                let packet = IncomingPacket::try_from(stream);
-                println!("packet: {:#?}", packet);
+                let packet = IncomingPacket::try_from(&mut stream);
+                println!("tcp: packet: {:#?}", packet);
 
                 // TODO: encapsulate instruction handlers
                 match packet {
-                    Err(err) => println!("error parsing packet: {:#?}", err),
                     Ok(IncomingPacket::Capture) => {
-                        // Turn LED on while image is being captured
+                        // Capture image while illuminating specified LED
                         // led.unwrap().set_high()?;
-                        // Capture image using camera
-                        let _image = camera_sensor.capture_image(true);
-                        // Turn LED back off after image capture completes
+                        let image = camera_sensor.capture_image(true).unwrap();
                         // led.unwrap().set_low()?;
+                        let write_result = stream.write(image);
+                        let flush_result = stream.flush();
+
+                        println!("{:#?}", write_result);
+                        println!("{:#?}", flush_result);
                     }
                     Ok(IncomingPacket::SetFrameSize(frame_size)) => {
                         println!("todo: set resolution")
@@ -74,6 +77,7 @@ fn main() -> anyhow::Result<()> {
                         println!("device: restarting"); // When in doubt.. restart your way out
                         restart();
                     }
+                    Err(err) => println!("error parsing packet: {:#?}", err),
                 }
             }
             Err(e) => {
