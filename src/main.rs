@@ -17,12 +17,23 @@ use wifi::init_wifi;
 fn main() -> anyhow::Result<()> {
     esp_idf_sys::link_patches();
 
+    // TODO: `Board::from_env()` can load board variant and potentially custom pin assignments
+    // internally
+    let board = env!("ESP32_BOARD");
+    let board = match board {
+        "Freenove" => Board::Freenove,
+        "AIThinker" => Board::AIThinker,
+        // TODO: "Custom"
+        _ => panic!("env var: invalid board specified"),
+    };
+
     // Initialize general hardware
     let sysloop = EspSystemEventLoop::take()?;
     let peripherals = Peripherals::take().unwrap();
-    // TODO: not all boards will have builtin led
-    let mut led = PinDriver::output(peripherals.pins.gpio2)?; // board's builtin LED
-    let board = Board::Freenove;
+    let mut led = match board {
+        Board::Freenove => Some(PinDriver::output(peripherals.pins.gpio2).unwrap()),
+        _ => None,
+    };
 
     // Initialize wifi
     let wifi_ssid = env!("WIFI_SSID");
@@ -47,11 +58,11 @@ fn main() -> anyhow::Result<()> {
                     Err(err) => println!("error parsing packet: {:#?}", err),
                     Ok(IncomingPacket::Capture) => {
                         // Turn LED on while image is being captured
-                        led.set_high()?;
+                        // led.unwrap().set_high()?;
                         // Capture image using camera
                         let _image = camera_sensor.capture_image(true);
                         // Turn LED back off after image capture completes
-                        led.set_low()?;
+                        // led.unwrap().set_low()?;
                     }
                     Ok(IncomingPacket::SetFrameSize(frame_size)) => {
                         println!("todo: set resolution")

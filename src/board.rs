@@ -63,7 +63,7 @@ pub struct MipiPins {
 
 // TODO: replace Clone + Copy trait and pass via reference
 // Pin assignment for DVP interface
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct DvpPins {
     // Power down
     pub pwdn: c_int,
@@ -93,7 +93,7 @@ pub struct DvpPins {
     pub d0: c_int,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Board {
     Freenove,
     AIThinker,
