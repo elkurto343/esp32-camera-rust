@@ -2,8 +2,8 @@ use esp_idf_hal::{gpio::PinDriver, peripherals::Peripherals, reset::restart};
 use esp_idf_svc::eventloop::EspSystemEventLoop;
 use esp_idf_sys::{self as _};
 
-use std::io::Write;
 use std::net::TcpListener;
+use std::{io::Write, num};
 
 mod board;
 mod camera;
@@ -14,6 +14,8 @@ use board::Board;
 use camera::CameraSensor;
 use packet::{IncomingPacket, OutgoingPacket};
 use wifi::init_wifi;
+
+const PACKET_CHUNK_SIZE: usize = 1400;
 
 fn main() -> anyhow::Result<()> {
     esp_idf_sys::link_patches();
@@ -61,11 +63,18 @@ fn main() -> anyhow::Result<()> {
                         // led.unwrap().set_high()?;
                         let image = camera_sensor.capture_image(true).unwrap();
                         // led.unwrap().set_low()?;
-                        let write_result = stream.write(image);
-                        let flush_result = stream.flush();
 
-                        println!("{:#?}", write_result);
-                        println!("{:#?}", flush_result);
+                        for chunk in image.chunks(PACKET_CHUNK_SIZE) {
+                            let write_result = stream.write(chunk);
+                            match write_result {
+                                Ok(num_bytes) => println!("tcp: wrote packet: {} bytes", num_bytes),
+                                Err(e) => {
+                                    eprintln!("error: tcp: failed to write packet {:#?}", e)
+                                }
+                            }
+                        }
+
+                        stream.flush();
                     }
                     Ok(IncomingPacket::SetFrameSize(frame_size)) => {
                         println!("todo: set resolution")
