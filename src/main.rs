@@ -5,12 +5,12 @@ use esp_idf_hal::{peripherals::Peripherals, reset::restart};
 use esp_idf_svc::eventloop::EspSystemEventLoop;
 use esp_idf_sys::{self as _};
 
-mod board;
+mod boards;
 mod camera;
 mod packet;
 mod wifi;
 
-use board::Board;
+use boards::Board;
 use camera::CameraSensor;
 use packet::IncomingPacket;
 use wifi::init_wifi;

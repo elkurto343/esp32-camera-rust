@@ -1,44 +1,10 @@
 use std::os::raw::c_int;
 
-// TODO: refactor and move board constants to their own files
+mod aithinker;
+mod freenove;
 
-const FREENOVE_DVP_PINS: DvpPins = DvpPins {
-    pwdn: -1,
-    rst: -1,
-    xclk: 21,
-    pclk: 22,
-    vsync: 25,
-    href: 23,
-    sda: 26,
-    scl: 27,
-    d7: 35,
-    d6: 34,
-    d5: 39,
-    d4: 36,
-    d3: 19,
-    d2: 18,
-    d1: 5,
-    d0: 4,
-};
-
-const AITHINKER_DVP_PINS: DvpPins = DvpPins {
-    pwdn: 32,
-    rst: -1,
-    xclk: 0,
-    pclk: 22,
-    vsync: 25,
-    href: 23,
-    sda: 26,
-    scl: 27,
-    d7: 35,
-    d6: 34,
-    d5: 39,
-    d4: 36,
-    d3: 21,
-    d2: 19,
-    d1: 18,
-    d0: 5,
-};
+use aithinker::AITHINKER_DVP_PINS;
+use freenove::FREENOVE_DVP_PINS;
 
 // Pin assignment for MIPI interface
 #[derive(Debug)]

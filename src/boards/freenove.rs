@@ -1,0 +1,18 @@
+pub const FREENOVE_DVP_PINS: super::DvpPins = super::DvpPins {
+    pwdn: -1,
+    rst: -1,
+    xclk: 21,
+    pclk: 22,
+    vsync: 25,
+    href: 23,
+    sda: 26,
+    scl: 27,
+    d7: 35,
+    d6: 34,
+    d5: 39,
+    d4: 36,
+    d3: 19,
+    d2: 18,
+    d1: 5,
+    d0: 4,
+};

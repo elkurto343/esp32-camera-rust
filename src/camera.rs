@@ -5,7 +5,7 @@ use std::os::raw::c_int;
 use esp_idf_sys::*;
 use esp_idf_sys::{esp_camera_fb_get, esp_camera_fb_return, esp_camera_init, sensor_t};
 
-use crate::board::DvpPins;
+use crate::boards::DvpPins;
 
 const DEFAULT_PIXEL_FORMAT: PixelFormat = PixelFormat::JPEG;
 const DEFAULT_FRAME_SIZE: FrameSize = FrameSize::SVGA;
