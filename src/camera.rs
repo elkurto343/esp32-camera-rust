@@ -3,7 +3,7 @@ use core::convert::From;
 use std::os::raw::c_int;
 
 use esp_idf_sys::*;
-use esp_idf_sys::{esp_camera_fb_get, esp_camera_fb_return, esp_camera_init};
+use esp_idf_sys::{esp_camera_fb_get, esp_camera_fb_return, esp_camera_init, sensor_t};
 
 use crate::board::DvpPins;
 
@@ -99,6 +99,7 @@ impl Default for PixelFormat {
     }
 }
 
+// TODO: implement traits for comparing frame sizes
 // TODO: refactor/extend to support OV5640
 // ESP32 supported image resolutions encapsulated in a Rust enum with transforms
 #[derive(Debug, Clone)]
@@ -151,6 +152,12 @@ impl Default for FrameSize {
     fn default() -> Self {
         DEFAULT_FRAME_SIZE
     }
+}
+
+pub struct SensorInfo {
+    pid: u16,
+    name: &'static str,
+    max_frame_size: FrameSize,
 }
 
 // representation of camera sensor for direct use with esp32-camera library via transform
@@ -219,6 +226,10 @@ impl CameraSensor {
         }
     }
 
+    fn get_sensor(&self) -> *mut sensor_t {
+        unsafe { esp_camera_sensor_get() }
+    }
+
     // TODO: the sensor functions are added to esp32-camera as conditional includes (via macro)
     // and bindings are not generated for them. Unsure if/how it's possible to expose them. Adding
     // `CONFIG_OV2640_SUPPORT=y` to `sdkconfig.defaults` seems to have no effect.
@@ -232,18 +243,19 @@ impl CameraSensor {
     //     // if result != 0 {}
     // }
 
-    // pub fn set_frame_size(&mut self, framesize: FrameSize) {
-    //     self.frame_size = framesize;
-    //     let sensor: *mut sensor_t = unsafe { esp_camera_sensor_get() };
-    //
-    //     let result = unsafe { set_framesize(*sensor, framesize.clone().into()) };
-    //     // if result != 0 {}
-    //
-    //     // if self.pixel_format == PixelFormat::JPEG {
-    //     // let result = unsafe { *sensor.set_framesize(sensor, framesize.into()) };
-    //     // Handle the result if needed
-    //     // }
-    // }
+    pub fn set_frame_size(&mut self, framesize: FrameSize) -> Result<(), ()> {
+        let sensor = self.get_sensor();
+        if let Some(set_framesize) = unsafe { (*sensor).set_framesize } {
+            let result = unsafe { set_framesize(sensor, framesize.clone().into()) };
+            if result == 0 {
+                return Ok(());
+            } else {
+                return Err(());
+            }
+        } else {
+            return Err(());
+        }
+    }
 
     // pub fn set_jpeg_quality(&mut self, jpeg_quality: JpegQuality) {
     //     // min: 0, max: 63
@@ -276,4 +288,16 @@ impl CameraSensor {
 
         Ok(img_data)
     }
+
+    // pub fn sensor_info(self) -> SensorInfo {
+    //     let sensor = self.get();
+    //     let pid = unsafe { (*sensor).id };
+    //     let name = unsafe { (*sensor).name };
+    //     let max_frame_size = unsafe { (*sensor).max_size };
+    //     SensorInfo {
+    //         pid,
+    //         name,
+    //         max_frame_size,
+    //     }
+    // }
 }
