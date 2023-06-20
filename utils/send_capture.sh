@@ -1,6 +1,6 @@
-# TODO: replace with rust cli tool
-
 #!/bin/bash
+
+# TODO: replace with rust cli tool
 
 if [ -z "$BOARD_IP" ]; then
 	echo "Error: BOARD_IP not set"
