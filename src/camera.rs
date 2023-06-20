@@ -152,7 +152,7 @@ impl CameraSensor {
     //     // if result != 0 {}
     // }
 
-    pub fn set_frame_size(&mut self, framesize: FrameSize) -> Result<(), ()> {
+    pub fn set_frame_size(&self, framesize: FrameSize) -> Result<(), ()> {
         let sensor = self.get_sensor();
         if let Some(set_framesize) = unsafe { (*sensor).set_framesize } {
             let result = unsafe { set_framesize(sensor, framesize.clone().into()) };
