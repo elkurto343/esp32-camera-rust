@@ -21,18 +21,14 @@ impl TryFrom<&mut TcpStream> for IncomingPacket {
 
     // Try deserialize incoming packet from TCPStream
     fn try_from(stream: &mut TcpStream) -> io::Result<Self> {
-        println!("stream: {:#?}", stream);
         let mut buf = [0; 5];
         stream.read_exact(&mut buf).unwrap();
-        println!("buf: {:#?}", buf);
 
         // Note: the packet format is effectively a header byte used for identifying the packet
-        // type followed by optional payload bytes (currently max 4)
+        // type followed by optional payload bytes (currently max 4 to match the unsigned 32-bit
+        // integers that represent either FrameSize or PixelFormat)
         let header = buf[0];
         let payload = &buf[1..5];
-
-        println!("header: {:#?}", header);
-        println!("payload: {:#?}", payload);
 
         match header {
             1 => Ok(IncomingPacket::Capture),

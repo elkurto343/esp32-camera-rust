@@ -151,11 +151,14 @@ impl CameraSensor {
         if let Some(set_framesize) = unsafe { (*sensor).set_framesize } {
             let result = unsafe { set_framesize(sensor, framesize.clone().into()) };
             if result == 0 {
+                println!("set: frame size: {:#?}", framesize);
                 return Ok(());
             } else {
+                println!("error: set frame size: failed to set framesize");
                 return Err(());
             }
         } else {
+            println!("error: set frame size: c-interop: failed to deference function");
             return Err(());
         }
     }

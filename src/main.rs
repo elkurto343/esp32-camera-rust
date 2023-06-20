@@ -50,7 +50,6 @@ fn main() -> anyhow::Result<()> {
                         stream.flush();
                     }
                     Ok(IncomingPacket::SetFrameSize(frame_size)) => {
-                        println!("set: frame size: {:#?}", frame_size);
                         let result = camera_sensor.set_frame_size(frame_size);
                         match result {
                             Ok(_) => stream.write(vec![1; 1].as_slice()),
