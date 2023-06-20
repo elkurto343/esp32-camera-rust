@@ -31,7 +31,7 @@ impl From<u32> for PixelFormat {
             pixformat_t_PIXFORMAT_RGB565 => PixelFormat::RGB565,
             pixformat_t_PIXFORMAT_YUV422 => PixelFormat::YUV422,
             pixformat_t_PIXFORMAT_JPEG => PixelFormat::JPEG,
-            _ => panic!("Invalid value for PixelFormat"),
+            _ => DEFAULT_PIXEL_FORMAT,
         }
     }
 }

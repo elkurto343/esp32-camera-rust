@@ -46,7 +46,7 @@ impl From<u32> for FrameSize {
             framesize_t_FRAMESIZE_XGA => FrameSize::XGA,
             framesize_t_FRAMESIZE_SXGA => FrameSize::SXGA,
             framesize_t_FRAMESIZE_UXGA => FrameSize::UXGA,
-            _ => panic!("Invalid value for FrameSize"),
+            _ => DEFAULT_FRAME_SIZE,
         }
     }
 }
