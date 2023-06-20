@@ -50,10 +50,17 @@ fn main() -> anyhow::Result<()> {
                         stream.flush();
                     }
                     Ok(IncomingPacket::SetFrameSize(frame_size)) => {
-                        println!("todo: set resolution")
+                        println!("set: frame size: {:#?}", frame_size);
+                        let result = if let Ok(_) = camera_sensor.set_frame_size(frame_size) {
+                            true
+                        } else {
+                            false
+                        };
+                        stream.write(result);
+                        stream.flush();
                     }
                     Ok(IncomingPacket::SetPixelFormat(pixel_format)) => {
-                        println!("todo: set pixel format")
+                        println!("todo: set pixel format");
                     }
                     Ok(IncomingPacket::Restart) => {
                         println!("device: restarting"); // When in doubt.. restart your way out
