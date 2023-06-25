@@ -2,8 +2,11 @@ use base64::Engine;
 use core::convert::From;
 use std::os::raw::c_int;
 
-use esp_idf_sys::*;
-use esp_idf_sys::{esp_camera_fb_get, esp_camera_fb_return, esp_camera_init, sensor_t};
+use esp_idf_sys::esp_camera::{
+    esp_camera_fb_get, esp_camera_fb_return, esp_camera_init, esp_camera_sensor_get, sensor_t, camera_config_t, camera_config_t__bindgen_ty_1, camera_config_t__bindgen_ty_2,
+    ledc_channel_t_LEDC_CHANNEL_0, ledc_channel_t_LEDC_CHANNEL_1, ledc_channel_t_LEDC_CHANNEL_2, ledc_channel_t_LEDC_CHANNEL_3, ledc_channel_t_LEDC_CHANNEL_4, ledc_channel_t_LEDC_CHANNEL_5,
+    ledc_channel_t_LEDC_CHANNEL_6, ledc_channel_t_LEDC_CHANNEL_7, ledc_timer_t_LEDC_TIMER_0, ledc_timer_t_LEDC_TIMER_1, ledc_timer_t_LEDC_TIMER_2, ledc_timer_t_LEDC_TIMER_3
+};
 
 use crate::boards::DvpPins;
 

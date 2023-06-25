@@ -1,9 +1,14 @@
-/.vscode
-/.embuild
-/target
-/Cargo.lock
-/esp32-camera
-/cfg.toml
+.vscode
+.embuild
+target
+Cargo.lock
+esp32-camera
+cfg.toml
 .env
-/captures
+captures
 .DS_Store
+
+
+# Added by cargo
+
+/target

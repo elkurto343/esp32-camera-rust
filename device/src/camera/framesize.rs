@@ -1,4 +1,4 @@
-use esp_idf_sys::*;
+use esp_idf_sys::esp_camera::*;
 
 pub const DEFAULT_FRAME_SIZE: FrameSize = FrameSize::SVGA;
 

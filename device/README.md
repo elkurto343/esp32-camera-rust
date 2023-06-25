@@ -1,6 +1,5 @@
 ## About
 
-
 This is a pet project for learning the Rust language and using it on an ESP32 microcontroller device with camera module.
 The aim is to have the device take images of a garage door on-demand so I can remotely check if I forgot to close it.
 
@@ -16,10 +15,12 @@ The aim is to communicate with the microcontroller directly via TCP. HTTP packet
 ![ESP32-Cam](./static/readme-freenove-aithinker-boards.jpg)
 
 This projects currently supports two variants of ESP32 board:
+
 - Freenove WROVER
 - AIThinker WROOM
 
 And two camera modules:
+
 - OV2640
 - OV5640
 
@@ -50,8 +51,6 @@ Edit `Cargo.toml` and configure an extra component (`esp-idf-sys` handles bindge
 ```toml
 [package.metadata.esp-idf-sys]
 extra_components = [
-  { component_dirs = "./esp32-camera", bindings_header = "esp32-camera-bindings.h" }
+  { component_dirs = "./esp32-camera", bindings_header = "esp32-camera-bindings.h", bindings_module = "esp_camera" }
 ]
 ```
-
-At the time of writing, setting `bindings_module` was triggering compile errors related to `c_types`.

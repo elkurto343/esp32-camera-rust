@@ -19,12 +19,12 @@ opt-level = "z"
 pio = ["esp-idf-sys/pio"]
 
 [dependencies]
-esp-idf-sys = { version = "0.32.1", features = ["binstart"] }
-esp-idf-hal = { version = "0.40.1" }
-esp-idf-svc = { version = "0.45.0" }
+esp-idf-sys = { version = "0.33.1", features = ["binstart"] }
+esp-idf-hal = { version = "0.41.2" }
+esp-idf-svc = { version = "0.46.0" }
 base64 = "0.21.0"
 anyhow = "1.0.71"
-embedded-svc = "0.24.0"
+embedded-svc = "0.25.1"
 
 [patch.crates-io]
 # https://github.com/esp-rs/esp-idf-hal/issues/215#issuecomment-1462363166
@@ -37,5 +37,5 @@ dotenv-build = "0.1.1"
 
 [package.metadata.esp-idf-sys]
 extra_components = [
-  { component_dirs = "./esp32-camera", bindings_header = "esp32-camera-bindings.h" }
+  { component_dirs = "./esp32-camera", bindings_header = "esp32-camera-bindings.h", bindings_module = "esp_camera" }
 ]
